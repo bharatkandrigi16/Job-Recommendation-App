@@ -1,6 +1,6 @@
 import torch 
 from transformers import AdamW
-from dataset import model, dataset, dataloader, tokenizer
+from dataset import model, dataset, dataloader, tokenizer, label_map
 from django.http import JsonResponse
 
 #set up optimizer and training parameters
@@ -39,11 +39,11 @@ def generate_job_title(keywords):
     attention_mask = inputs['attention_mask']
 
     with torch.no_grad():
-        outputs = model.generate(input_ids=input_ids, attention_mask=attention_mask, max_length=32)
+        outputs = model(input_ids=input_ids, attention_mask=attention_mask)
+        prediction = outputs.logits.argmax(dim=-1).item()
 
-    title = tokenizer.decode(outputs[0], skip_special_tokens=True)
-    return JsonResponse({'job_title': title})
-
+    title = list(label_map.keys())[list(label_map.values()).index(prediction)]
+    return title
 
 print(generate_job_title("data science"))
 

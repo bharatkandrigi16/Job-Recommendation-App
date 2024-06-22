@@ -1,4 +1,5 @@
 from transformers import BertTokenizer, BertForSequenceClassification
+import torch 
 
 #data pairs - assuming user is a college student looking for IT/Tech roles
 data = [
@@ -20,8 +21,21 @@ data = [
     ("test specialist","Quality Assurance Specialist") 
 ]
 
+label_map = {
+            "Data Scientist": 0,
+            "Python Developer": 1,
+            "Software Engineer": 2,
+            "C++ Developer": 3,
+            "Java Developer": 4,
+            "Data Engineer": 5,
+            "Data Analyst": 6,
+            "Customer Success Manager": 7,
+            "Customer Service Representative": 8,
+            "Quality Assurance Specialist": 9,
+        }
+
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-model = BertForSequenceClassification.from_pretrained('bert-base-uncased')
+model = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_labels=10)
 
 #Prepare dataset for training
 from torch.utils.data import Dataset, DataLoader
@@ -40,29 +54,13 @@ class JobTitleDataset(Dataset):
         keywords, title = self.data[idx]
         inputs = self.tokenizer.encode_plus(keywords, max_length=self.max_length, truncation=True, padding='max_length', return_tensors='pt')
         #labels = self.tokenizer.encode_plus(title, max_length=self.max_length, truncation=True, padding='max_length', return_tensors='pt')['input_ids']
-        label = self.get_label_index(title)
+        label = torch.tensor(label_map[title], dtype=torch.long)
         return {
             'input_ids': inputs['input_ids'].flatten(),
             'attention_mask': inputs['attention_mask'].flatten(),
             'labels': label
         }
     
-    def get_label_index(self, title):
-        label_map = {
-            "Data Scientist": 0,
-            "Python Developer": 1,
-            "Software Engineer": 2,
-            "C++ Developer": 3,
-            "Java Developer": 4,
-            "Data Engineer": 5,
-            "Data Analyst": 6,
-            "Customer Success Manager": 7,
-            "Customer Service Representative": 8,
-            "Quality Assurance Specialist": 9
-        }
-        return label_map[title]
-    
 #Create dataset and dataloader
 dataset = JobTitleDataset(data, tokenizer)
 dataloader = DataLoader(dataset, batch_size=8, shuffle=True)
-
