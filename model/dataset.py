@@ -22,17 +22,17 @@ data = [
 ]
 
 label_map = {
-            "Data Scientist": 0,
-            "Python Developer": 1,
-            "Software Engineer": 2,
-            "C++ Developer": 3,
-            "Java Developer": 4,
-            "Data Engineer": 5,
-            "Data Analyst": 6,
-            "Customer Success Manager": 7,
-            "Customer Service Representative": 8,
-            "Quality Assurance Specialist": 9,
-        }
+        "Data Scientist": 0,
+        "Python Developer": 1,
+        "Software Engineer": 2,
+        "C++ Developer": 3,
+        "Java Developer": 4,
+        "Data Engineer": 5,
+        "Data Analyst": 6,
+        "Customer Success Manager": 7,
+        "Customer Service Representative": 8,
+        "Quality Assurance Specialist": 9,
+    }
 
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 model = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_labels=10)
